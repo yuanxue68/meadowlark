@@ -1,5 +1,6 @@
 # meadowlark
 built with:  
-Express/Node.js  
+Express/Node.js 
+handlebars  
 mocha  
 grunt  
