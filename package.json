@@ -1,0 +1,22 @@
+{
+  "name": "meadowlark",
+  "version": "1.0.0",
+  "description": "",
+  "main": "meadowlark.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yuanxue68/meadowlark.git"
+  },
+  "author": "yuan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yuanxue68/meadowlark/issues"
+  },
+  "homepage": "https://github.com/yuanxue68/meadowlark",
+  "dependencies": {
+    "express": "^4.12.3"
+  }
+}
