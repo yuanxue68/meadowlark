@@ -1,5 +1,5 @@
 # meadowlark
-built with:
-Express/Node.js
-mocha
-grunt
+built with:  
+Express/Node.js  
+mocha  
+grunt  
