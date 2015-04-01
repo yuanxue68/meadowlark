@@ -13,8 +13,10 @@ var handlebars = require('express3-handlebars').create({
 
 //custom modles
 var fortune=require('./lib/fortune.js');
+
 //app initialization
 var app = express();
+app.use(require('body-parser')());
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('port', process.env.PORT || 3000);
@@ -53,6 +55,17 @@ app.get('/tours/request-group-rate',function(re,res){
 	res.render('tours/request-group-rate');
 });
 
+app.get('/newsletter',function(req,res){
+	res.render('newsletter',{csrf:'CSRF token goes here'});
+});
+
+app.post('/process',function(req,res){
+	console.log('Form (from querystring): ' + req.query.form);
+	console.log('CSRF token (from hidden form field): ' + req.body._csrf);
+	console.log('Name (from visible form field): ' + req.body.name);
+	console.log('Email (from visible form field): ' + req.body.email);
+	res.redirect(303, '/thank-you');
+})
 // custom 404 page
 app.use(function(req, res){
 	res.status(404);
