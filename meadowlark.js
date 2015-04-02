@@ -10,6 +10,8 @@ var handlebars = require('express3-handlebars').create({
 		}
 	} 
 });
+var jqupload = require('jquery-file-upload-middleware');
+var formidable=require('formidable');
 
 //custom modles
 var fortune=require('./lib/fortune.js');
@@ -35,6 +37,18 @@ app.use(function(req,res,next){
 	next();
 });
 
+app.use('/upload', function(req, res, next){
+	var now = Date.now();
+	jqupload.fileHandler({
+		uploadDir: function(){
+		return __dirname + '/public/uploads/' + now;
+		},
+		uploadUrl: function(){
+		return '/uploads/' + now;
+		},
+	})(req, res, next);
+});
+
 //route to index
 app.get('/',function(req,res){
 	res.render('home');
@@ -47,7 +61,7 @@ app.get('/about',function(req,res){
 	});
 });
 
-app.get('/tours/hood-river',function(req,res){
+app.get('/tours/ho od-river',function(req,res){
 	res.render('tours/hood-river');
 });
 
@@ -55,17 +69,45 @@ app.get('/tours/request-group-rate',function(re,res){
 	res.render('tours/request-group-rate');
 });
 
+app.get('/thank-you',function(re,res){
+	res.render('thank-you');
+});
+
 app.get('/newsletter',function(req,res){
 	res.render('newsletter',{csrf:'CSRF token goes here'});
 });
 
-app.post('/process',function(req,res){
-	console.log('Form (from querystring): ' + req.query.form);
-	console.log('CSRF token (from hidden form field): ' + req.body._csrf);
-	console.log('Name (from visible form field): ' + req.body.name);
-	console.log('Email (from visible form field): ' + req.body.email);
-	res.redirect(303, '/thank-you');
-})
+app.get('/contest/vacation-photo',function(req,res){
+	var now=new Date();
+	res.render('contest/vacation-photo',{
+		year:now.getFullYear(),
+		month:now.getMonth()
+	});
+});
+
+app.post('/contest/vacation-photo/:year/:month', function(req, res){
+	var form=new formidable.IncomingForm();
+	form.parse(req,function(err,fields,files){
+		if(err)
+			return res.redirect(303,'/error');
+		console.log('received fields:');
+		console.log(fields);
+		console.log('received files:');
+		console.log(files);
+		res.redirect(303, '/thank-you');
+	});
+});
+
+app.post('/process', function(req, res){
+	if(req.xhr || req.accepts('json,html')==='json'){
+	// if there were an error, we would send { error: 'error description' }
+		res.send({ success: true });
+	} else {
+	// if there were an error, we would redirect to an error page
+		res.redirect(303, '/thank-you');
+	}
+});
+
 // custom 404 page
 app.use(function(req, res){
 	res.status(404);
