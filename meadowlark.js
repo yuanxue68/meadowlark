@@ -12,9 +12,11 @@ var handlebars = require('express3-handlebars').create({
 });
 var jqupload = require('jquery-file-upload-middleware');
 var formidable=require('formidable');
+var credentials=require('./credentials.js');
 
 //custom modles
 var fortune=require('./lib/fortune.js');
+var cartValidation=require('./lib/cartValidation.js');
 
 //app initialization
 var app = express();
@@ -23,6 +25,10 @@ app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('port', process.env.PORT || 3000);
 app.use(express.static(__dirname+'/public'));
+app.use(require('cookie-parser')(credentials.cookieSecret));
+app.use(require('express-session')());
+app.use(cartValidation.checkWaivers);
+app.use(cartValidation.checkGuestCounts);
 
 //set up test
 app.use(function(req,res,next){
@@ -48,6 +54,12 @@ app.use('/upload', function(req, res, next){
 		},
 	})(req, res, next);
 });
+
+app.use(function(req,res,next){
+	res.locals.flash=req.session.flash;
+	delete req.session.flashl
+	next();
+})
 
 //route to index
 app.get('/',function(req,res){
