@@ -1,3 +1,4 @@
+//library imports
 var express = require('express');
 var handlebars = require('express3-handlebars').create({ 
 	defaultLayout:'main',
@@ -13,10 +14,9 @@ var handlebars = require('express3-handlebars').create({
 var jqupload = require('jquery-file-upload-middleware');
 var formidable=require('formidable');
 var credentials=require('./credentials.js');
-
-//custom modles
 var fortune=require('./lib/fortune.js');
 var cartValidation=require('./lib/cartValidation.js');
+var nodemailer=require('nodemailer');
 
 //app initialization
 var app = express();
@@ -30,6 +30,13 @@ app.use(require('express-session')());
 app.use(cartValidation.checkWaivers);
 app.use(cartValidation.checkGuestCounts);
 
+var mailTransport=nodemailer.createTransport('SMTP',{
+	service:"Gmail",
+	auth: {
+		user:credentials.gmail.user,
+		pass:credentials.gmail.password,
+	}
+})
 //set up test
 app.use(function(req,res,next){
 	res.locals.showTests=app.get('env')!=='prodution'&&req.query.test==='1';
