@@ -1,14 +1,5 @@
 //library imports
 var express = require('express');
-var http = require('http');
-var mongoose=require('mongoose');
-var Vacation = require('./models/vacation.js');
-var opts={
-	server:{
-		socketOptions:{keepAlive:1}
-	}
-};
-
 var handlebars = require('express3-handlebars').create({ 
 	defaultLayout:'main',
 	helper:{
@@ -26,28 +17,9 @@ var credentials=require('./credentials.js');
 var fortune=require('./lib/fortune.js');
 var cartValidation=require('./lib/cartValidation.js');
 var nodemailer=require('nodemailer');
-var fs=require('fs');
 
-var dataDir = __dirname + '/data';
-var vacationPhotoDir = dataDir + '/vacation-photo';
-fs.existsSync(dataDir) || fs.mkdirSync(dataDir);
-fs.existsSync(vacationPhotoDir) || fs.mkdirSync(vacationPhotoDir);
-function saveContestEntry(contestName, email, year, month, photoPath){
-// TODO.
-}
 //app initialization
 var app = express();
-app.set('env','development');
-switch(app.get('env')){
-	case 'development':
-		mongoose.connect(credentials.mongo.development.connectionString,opts);
-		break;
-	case 'production':
-		mongoose.connect(credentials.mongo.production.connectionString, opts);
-		break;
-	default:
-		throw new Error('Unknown execution env');
-}
 app.use(require('body-parser')());
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
@@ -141,28 +113,13 @@ app.get('/contest/vacation-photo',function(req,res){
 app.post('/contest/vacation-photo/:year/:month', function(req, res){
 	var form=new formidable.IncomingForm();
 	form.parse(req,function(err,fields,files){
-		if(err) return res.redirect(303, '/error');
-		if(err) {
-			res.session.flash = {
-				type: 'danger',
-				intro: 'Oops!',
-				message: 'There was an error processing your submission. ' +
-				'Pelase try again.',
-			};
-			return res.redirect(303, '/contest/vacation-photo');
-		}
-		var photo = files.photo;
-		var dir = vacationPhotoDir + '/' + Date.now();
-		var path = dir + '/' + photo.name;
-		fs.mkdirSync(dir);
-		fs.renameSync(photo.path, dir + '/' + photo.name);
-		saveContestEntry('vacation-photo', fields.email, req.params.year, req.params.month, path);
-		req.session.flash = {
-			type: 'success',
-			intro: 'Good luck!',
-			message: 'You have been entered into the contest.',
-		};
-		return res.redirect(303, '/contest/vacation-photo/entries');
+		if(err)
+			return res.redirect(303,'/error');
+		console.log('received fields:');
+		console.log(fields);
+		console.log('received files:');
+		console.log(files);
+		res.redirect(303, '/thank-you');
 	});
 });
 
